@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>八十九分最亏 · 期末前，把哪门课多考几分最值</title>
+<meta name="description" content="绩点按分档换算，89 和 90 差一整档，80 和 89 却一样。填这学期每门课的学分和预计分、已修学分和已有绩点，看哪门课只差一两分就跨档、多考 1 分哪门最值、想到目标绩点最少还要多考几分。">
+<style>
+  :root{--bg:#f3f1ea;--paper:#fffdf7;--ink:#20211d;--ink2:#4f5148;--mut:#85877c;--line:#d9d5c7;--rule:#ebe7da;--red:#b3261e;--ok:#2d7146;--a:#2c5687;--hi:#eef2f7;--mark:#c2410c;--warn:#fdf3e2}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:22px 14px 72px}
+  h1{font-size:32px;line-height:1.2;margin:0 0 6px;letter-spacing:.02em}
+  .sub{color:var(--ink2);margin:0;font-size:15.5px}
+  .muted{color:var(--mut);font-size:13.5px}
+  .hide{display:none !important}
+  button,input,textarea{font:inherit}
+  button{cursor:pointer}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13.5px;color:var(--ink2)}
+  .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 18px;margin:14px 0;min-width:0}
+  .h2{font-size:15px;font-weight:700;margin:0 0 10px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  /* 成绩单抬头 */
+  .sheet{border-top:3px double var(--ink);border-bottom:3px double var(--ink);padding:10px 0 12px}
+  .tot{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:2px 0 10px}
+  .tot div{border:1px solid var(--rule);background:#fff;border-radius:4px;padding:6px 10px;min-width:0}
+  .tot span{display:block;font-size:12.5px;color:var(--mut)}
+  .tot b{font-size:26px;font-variant-numeric:tabular-nums;line-height:1.25}
+  .tot div.goal b{color:var(--mark)}
+  .head{font-size:21px;font-weight:800;line-height:1.45;margin:0 0 6px}
+  .head b{color:var(--mark)}
+  .why{color:var(--ink2);margin:0 0 8px;font-size:15px}
+  .acts{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 2px}
+  .act{background:var(--hi);border:1px solid #c5d2e2;border-radius:5px;padding:6px 12px;font-size:14px;color:var(--a);text-align:left;max-width:100%;overflow-wrap:anywhere}
+  .err{background:#fff5f4;border:1px solid #f0c9c5;border-radius:6px;padding:10px 14px;color:var(--red);margin:10px 0}
+  .err ul{margin:4px 0 0;padding-left:20px}
+  /* 每门课一行 */
+  .cl{margin-top:4px}
+  .cr{display:grid;grid-template-columns:minmax(0,1.5fr) 4.6em 4.6em minmax(0,2.4fr) 8.4em 1.8em;gap:6px 10px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line)}
+  .cr.hd{font-size:12.5px;color:var(--mut);padding:2px 0 4px;border-bottom:1px solid var(--ink)}
+  .cr input{width:100%;min-width:0;padding:4px 6px;border:1px solid var(--line);border-radius:4px;background:#fff}
+  .cr input.nm{font-weight:600}
+  .cr input.cs,.cr input.sc{text-align:right;font-variant-numeric:tabular-nums}
+  .cr .rd{font-size:13px;line-height:1.4;font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}
+  .cr .rd b{font-size:16px}
+  .cr .rd .up{color:var(--ok)} .cr .rd .dn{color:var(--red)}
+  .cr .x{border:0;background:none;color:var(--mut);font-size:18px;padding:0;line-height:1}
+  .cr.plan{background:linear-gradient(90deg,#fff4ea,transparent 70%)}
+  .tag{display:inline-block;font-size:11.5px;border-radius:3px;padding:0 5px;margin-left:4px;vertical-align:1px;white-space:nowrap}
+  .tag.near{background:#e6f1e8;color:var(--ok)} .tag.edge{background:#fbe7e5;color:var(--red)} .tag.pl{background:#ffe8d6;color:var(--mark)}
+  /* 分数尺 */
+  .ruler{position:relative;height:34px;min-width:0}
+  .ruler .bd{position:absolute;top:9px;height:12px;border-right:1px solid #fff}
+  .ruler .tk{position:absolute;top:24px;font-size:10.5px;color:var(--mut);transform:translateX(-50%);white-space:nowrap}
+  .ruler .dot{position:absolute;top:5px;width:4px;height:20px;margin-left:-2px;background:var(--ink);border-radius:2px}
+  .ruler .to{position:absolute;top:5px;width:4px;height:20px;margin-left:-2px;background:var(--mark);border-radius:2px}
+  .ruler .gap{position:absolute;top:13px;height:4px;background:var(--mark);opacity:.55}
+  .addrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .btn{background:#fff;border:1px solid var(--line);border-radius:5px;padding:6px 12px;font-size:14px;color:var(--ink)}
+  .btn.pri{background:var(--ink);border-color:var(--ink);color:#fff}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+  /* 多考 1 分 */
+  .rank{list-style:none;margin:0;padding:0}
+  .rank li{display:grid;grid-template-columns:1.6em minmax(0,1fr) minmax(0,1.3fr);gap:4px 10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--rule);font-size:14px}
+  .rank li .i{font-weight:800;color:var(--mut)}
+  .rank li .bar{height:10px;background:var(--rule);border-radius:3px;position:relative;overflow:hidden}
+  .rank li .bar span{position:absolute;left:0;top:0;bottom:0;background:var(--ok)}
+  .rank li .t{overflow-wrap:anywhere}
+  .rank li .v{grid-column:2 / -1;font-size:12.5px;color:var(--mut)}
+  .form{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px 18px}
+  .form label{display:flex;flex-direction:column;gap:3px;font-size:14px;color:var(--ink2)}
+  .form label span.in{display:flex;align-items:center;gap:6px;color:var(--ink)}
+  .form input{width:100%;min-width:0;padding:5px 7px;border:1px solid var(--line);border-radius:4px;text-align:right;background:#fff}
+  .form small{color:var(--mut);font-size:12.5px;line-height:1.45}
+  .form .u{white-space:nowrap;font-size:13.5px;color:var(--mut)}
+  textarea{width:100%;min-height:62px;padding:6px 8px;border:1px solid var(--line);border-radius:4px;font-size:14px;background:#fff;resize:vertical}
+  input.bad,textarea.bad{border-color:var(--red) !important;background:#fff5f4}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{border-bottom:1px solid var(--rule);padding:5px 6px;text-align:left}
+  th{font-size:12.5px;color:var(--ink2);font-weight:600}
+  td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  #scaleTbl th{white-space:nowrap} #tbl td:first-child{min-width:6.5em}
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .dl{display:flex;flex-wrap:wrap;gap:8px}
+  .foot{color:var(--mut);font-size:13px;margin-top:22px}
+  .foot li{margin:3px 0}
+  @media (max-width:760px){
+    h1{font-size:27px} .head{font-size:18.5px} .tot b{font-size:21px}
+    .cr{grid-template-columns:minmax(0,1fr) 4em 4em 1.6em;gap:4px 8px}
+    .cr.hd span:nth-child(4),.cr.hd span:nth-child(5){display:none}
+    .cr .ruler{grid-column:1 / -1;grid-row:2}
+    .cr .rd{grid-column:1 / -1;grid-row:3}
+    .cr .x{grid-column:4;grid-row:1}
+    .rank li{grid-template-columns:1.4em minmax(0,1fr)} .rank li .bar{grid-column:2} .rank li .v{grid-column:2}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>八十九分最亏</h1>
+  <p class="sub">绩点按分档换算：89 和 90 差一整档，80 和 89 却一样。期末前精力有限，先看哪门课只差一两分就跨档、多考 1 分哪门最值、想到目标绩点最少还要多考几分。</p>
+
+  <div class="chips" id="presets"></div>
+  <p class="muted" id="presetNote"></p>
+
+  <section class="panel" id="res">
+    <div class="sheet">
+      <div class="h2" style="margin-bottom:6px">成绩单 <span class="muted" id="saveTag"></span></div>
+      <div class="err hide" id="errBox"></div>
+      <div id="okBox">
+        <div class="tot" id="tot"></div>
+        <p class="head" id="headline"></p>
+        <p class="why" id="why"></p>
+        <div class="acts" id="acts"></div>
+      </div>
+    </div>
+
+    <div class="cl" id="cl"></div>
+    <div class="addrow">
+      <button type="button" class="btn" id="addC">＋ 加一门课</button>
+      <span class="muted" id="cnt"></span>
+    </div>
+  </section>
+
+  <section class="panel" id="rankPanel">
+    <div class="h2">多考 1 分，哪门最值 <span class="muted">按「跨到下一条线换来的累计绩点 ÷ 还差几分」排；停在两条线中间的分不算数</span></div>
+    <ul class="rank" id="rank"></ul>
+  </section>
+
+  <section class="panel">
+    <div class="h2">之前的成绩和目标</div>
+    <div class="form">
+      <label>之前已修学分<span class="in"><input type="text" id="prevCredits" inputmode="decimal"><span class="u">学分</span></span><small>大一第一学期填 0</small></label>
+      <label>之前的平均绩点<span class="in"><input type="text" id="prevGpa" inputmode="decimal"></span><small>教务系统里的累计绩点；已修 0 学分可留空</small></label>
+      <label>想到的累计绩点<span class="in"><input type="text" id="target" inputmode="decimal"></span><small>保研线、奖学金线……留空就只看排名</small></label>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="h2">你们学校怎么换算 <span class="muted">以教务处的规定为准</span></div>
+    <div class="chips" id="scales"></div>
+    <div id="customBox" class="hide" style="margin-top:8px">
+      <textarea id="custom" spellcheck="false"></textarea>
+      <p class="muted" style="margin:4px 0 0">每项写「分数线=绩点」，用逗号隔开；分数达到这条线就给这个绩点，低于最低那条给 0。</p>
+    </div>
+    <div class="scroll" style="margin-top:8px"><table id="scaleTbl"></table></div>
+  </section>
+
+  <section class="panel" id="tblPanel">
+    <div class="h2">逐门明细</div>
+    <div class="scroll"><table id="tbl"></table></div>
+  </section>
+
+  <section class="panel">
+    <div class="h2">带走</div>
+    <div class="dl">
+      <button type="button" class="btn pri" id="dlPng">结果卡 PNG</button>
+      <button type="button" class="btn" id="dlCsv">逐门表格 CSV</button>
+      <button type="button" class="btn" id="dlMd">文字 Markdown</button>
+      <button type="button" class="btn" id="dlJson">备份 JSON</button>
+      <button type="button" class="btn" id="impJson">导入备份</button>
+      <input type="file" id="impFile" accept=".json,application/json" class="hide">
+      <button type="button" class="btn" id="reset">恢复默认</button>
+    </div>
+    <p class="muted" style="margin:8px 0 0">输入只存在这台设备的浏览器里，不上传。</p>
+  </section>
+
+  <div class="foot">
+    <b>怎么算的、没算进去的事</b>
+    <ul>
+      <li>每门课：分数达到换算表里的某条线，就拿这条线的绩点（取能达到的最高那条），低于最低线拿 0。累计绩点 =（之前已修学分 × 之前的平均绩点 + 这学期每门的学分 × 绩点之和）÷ 总学分。</li>
+      <li>显示的绩点截到小数点后 3 位、不四舍五入，所以页面说「到了」就是真的到了。学分最小 0.5，计算全程用整数，不靠浮点。</li>
+      <li>「最少多考几分」：每门课多考的分只有跨到某条线上才有用，所以把每门课提到每条更高的线都试一遍（分组背包），找多考总分最少、累计还能到目标的那组；一样少时取绩点更高的。多考 1 分难不难、哪门课好提分，这里不知道，要你自己判断。</li>
+      <li>预置的三种换算只是常见形式，不代表任何具体学校；有的学校用等级制、有的课只算通过不算绩点、重修和补考另有规则，这些都没算。默认数字是虚构示例。</li>
+    </ul>
+  </div>
+</div>
+<script src="./core.js"></script>
+<script src="./ui.js"></script>
+</body>
+</html>
